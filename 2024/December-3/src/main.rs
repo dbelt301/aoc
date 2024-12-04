@@ -13,7 +13,6 @@ fn process_single_mul(input: &str) -> i32 {
     let i = match input.find(',') {
         Some(index) => index,
         None => {
-            // eprintln!("Error: No ',' character found in input: {}", input);
             return 0;
         }
     };
@@ -22,7 +21,6 @@ fn process_single_mul(input: &str) -> i32 {
     let x = match input[0..i].parse::<i32>() {
         Ok(num) => num,
         Err(e) => {
-            // eprintln!("Error parsing integer from input: {}: {}", &input[0..i], e);
             return 0;
         }
     };
@@ -31,7 +29,6 @@ fn process_single_mul(input: &str) -> i32 {
     let j = match input.find(')') {
         Some(index) => index,
         None => {
-            // eprintln!("Error: No ')' character found in input: {}", input);
             return 0;
         }
     };
@@ -40,7 +37,6 @@ fn process_single_mul(input: &str) -> i32 {
     let y = match input[i+1..j].parse::<i32>() {
         Ok(num) => num,
         Err(e) => {
-            // eprintln!("Error parsing integer from input: {}: {}", &input[i+1..j], e);
             return 0;
         }
     };
@@ -75,117 +71,55 @@ fn process_input(input: &str) -> i32 {
     sop
 }
 
-
-
-
-
-// Processes the input data
+// Processes the input data for part 2
 fn process_input_2(input: &str) -> i32 {
-
     let mut sop = 0;
-    let mut input = input.to_string(); // Convert input to a mutable String
-    let mut i = 0;
+    let mut do_pos = Vec::new();
+    let mut dont_pos = Vec::new();
 
-    // Repeat until no more "do()" or "don't()" are found
-    loop {
-
-
-        // Print the index of the first instance of 'do()'
-//        println!("do() found at index: {}", i);
-
-        // Find the first instance of the string 'don't()' that occurs after i in the input string
-        let j = match input[i..].find("don't()") {
-            Some(index) => index + i, // Adjust index to be relative to the original string
-            None => {
-                // eprintln!("Error: No 'don't()' character found in input: {}", input);
-                return sop;
-            }
-        };
-
-        // Print the index of the first instance of 'don't()'
-//        println!("don't() found at index: {}", j);
-
-        // Get the substring between i and j
-        let s = &input[i..j];
-println!("s: {}\n\n", s);
-        // Process the substring
-        sop += process_input(s);
-
-//        println!("sop: {}", sop);
-
-        // Find the first instance of the string 'do()' in the input string
-        i = match input.find("do()") {
-            Some(index) => index,
-            None => {
-                // eprintln!("Error: No 'do()' character found in input: {}", input);
-                return sop;
-            }
-        };
-
-        // Remove the processed part from the input string
-        input = input[j..].to_string();
-
-
-
-
-
- /* 
-        // Check if there are no more 'do()' or 'don't()' in the input
-        if !input.contains("do()") || !input.contains("don't()") {
-            return sop;
-        }
-    */
-        
+    // Find every instance of the sequence 'do(' in the input and append its position to the list 'do_pos'
+    for (i, _) in input.match_indices("do(") {
+        do_pos.push(i);
     }
 
-/* 
-    // Repeat forever
-    loop {
-        // Find the first instance of the string 'do()' in the input string
-        if (i != 0) {
-        //if true {
-            i = match input.find("do()") {
-                Some(index) => index,
-                None => {
-                    // eprintln!("Error: No do() character found in input: {}", input);
-                    return sop;
-                }
-            };
-        }
+    // Find every instance of the sequence 'don't(' in the input and append its position to the list 'dont_pos'
+    for (i, _) in input.match_indices("don't(") {
+        dont_pos.push(i);
+    }
+    
+    // Create an integer variable called start and assign to 0
+    let mut start = 0;
 
-        // print the index of the first instance of 'do()'
-//        println!("do() found at index: {}", i);
+    // set end to the first value in the list 'dont_pos'
+    let mut end = dont_pos[0];
 
-        // Find the first instance of the string 'don't()' that occurs after i in the input string
-        let j = match input[i..].find("don't()") {
-            Some(index) => index,
-            None => {
-                // eprintln!("Error: No don't() character found in input: {}", input);
-                return sop;
-            }
-        };
-
-        // Get the substring getween i and j
-        let s = &input[i..i+j];
+    // loop while start is less than the length of the input
+    while start < input.len() {
+        // Get the substring between start and end
+        let s = &input[start..end];
 
         // Process the substring
         sop += process_input(s);
 
-        println!("sop: {}", sop);
+        // Set start to minimum value in the list 'do_pos' that's greater than end
+        start = *do_pos.iter().filter(|&x| *x > end).min().unwrap_or(&input.len());
 
-        // Set input to the substring of input that occurs after j
-        input = input[j..].to_string();
+        // Set end to minimum value in the list 'dont_pos' that's greater than start
+        end = *dont_pos.iter().filter(|&x| *x > start).min().unwrap_or(&input.len());
+
     }
-    */
+
+    sop
 }
 
 
-
+// Main entry point
 fn main() {
 
     // The input file is input.txt
-    let infile = "input.txt";
-
+//    let infile = "input.txt";
+    let mut infile = "/Users/dbelt365/Code/aoc/2024/December-3/input.txt";
+    
     // Read the input file into a string
     let input = std::fs::read_to_string(infile).unwrap();
 
