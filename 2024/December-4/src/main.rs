@@ -56,33 +56,27 @@ fn count_x_mas(position: (i32, i32), matrix: &Array<char, ndarray::Dim<[usize; 2
 
     // Create teh upward vector
     let mut upward = String::new();
-    if position.0 -1 > 0 && position.1 -1 > 0 {
+    if position.0 -1 >= 0 && position.1 -1 >= 0 {
         upward.push(matrix[[position.0 as usize - 1, position.1 as usize - 1]]);
-    } 
+    }
     upward.push(matrix[[position.0 as usize, position.1 as usize]]);
-    if position.0 +1 < matrix.dim().0 as i32 && position.1 +1 < matrix.dim().1 as i32 {
+    if position.0 + 1 < matrix.dim().0 as i32 && position.1 + 1 < matrix.dim().1 as i32 {
         upward.push(matrix[[position.0 as usize + 1, position.1 as usize + 1]]);
     }
 
     // Create the downward vector
     let mut downward = String::new();
-    if position.0 +1 < matrix.dim().0 as i32 && position.1 -1 > 0 {
+    if position.0 +1 < matrix.dim().0 as i32 && position.1 -1 >= 0 {
         downward.push(matrix[[position.0 as usize + 1, position.1 as usize - 1]]);
     }
     downward.push(matrix[[position.0 as usize, position.1 as usize]]);
-    if position.0 -1 > 0 && position.1 +1 < matrix.dim().1 as i32 {
+    if position.0 -1 >= 0 && position.1 +1 < matrix.dim().1 as i32 {
         downward.push(matrix[[position.0 as usize - 1, position.1 as usize + 1]]);
     }
 
     // Check if upward or downward is equal to MAS or SAM
     if ((upward == MAS) || (upward == SAM)) && 
         ((downward == MAS) || (downward == SAM)) {
-            // print position
-
-            println!("Position: ({}, {})", position.0, position.1);
-
-
-            //println!("Upward: {}, Downward: {}", upward, downward);
             count += 1;
     }
 
@@ -136,7 +130,7 @@ fn process_part_2(input: &str) -> i32 {
     }
 
        // Walk through the matrix and check each value for 'A'
-       for i in 0..lines.len() {
+    for i in 0..lines.len() {
         for j in 0..lines[0].len() {
             if xmas_matrix[[i, j]] == 'A' {
                 xmas_count += count_x_mas((i.try_into().unwrap(), j.try_into().unwrap()), &xmas_matrix);
@@ -150,8 +144,8 @@ fn process_part_2(input: &str) -> i32 {
 // Main entry point
 fn main() {
     // The input file is input.txt
-//    let infile = "input.txt";
-    let infile = "/Users/dbelt365/Code/aoc/2024/December-4/input.txt";
+    let infile = "input.txt";
+//    let infile = "/Users/dbelt365/Code/aoc/2024/December-4/input.txt";
     
     // Read the input file into a string
     let input = std::fs::read_to_string(infile).unwrap();
