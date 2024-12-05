@@ -10,6 +10,8 @@ use ndarray::Array;
 
 // Constants
 const XMAS: &str = "XMAS";
+const MAS: &str = "MAS";
+const SAM: &str = "SAM";
 const XMAS_LEN: i32 = XMAS.len() as i32;
 const DIRECTION_VECTORS: [(i32, i32); 8] = [(0, 1), // North
                                             (0, -1), // South
@@ -48,6 +50,45 @@ fn count_xmas(position: (i32, i32), matrix: &Array<char, ndarray::Dim<[usize; 2]
     count
 }
 
+// Function to count the number of XMAS strings at a given coordinate
+fn count_x_mas(position: (i32, i32), matrix: &Array<char, ndarray::Dim<[usize; 2]>>) -> i32 {
+    let mut count = 0;
+
+    // Create teh upward vector
+    let mut upward = String::new();
+    if position.0 -1 > 0 && position.1 -1 > 0 {
+        upward.push(matrix[[position.0 as usize - 1, position.1 as usize - 1]]);
+    } 
+    upward.push(matrix[[position.0 as usize, position.1 as usize]]);
+    if position.0 +1 < matrix.dim().0 as i32 && position.1 +1 < matrix.dim().1 as i32 {
+        upward.push(matrix[[position.0 as usize + 1, position.1 as usize + 1]]);
+    }
+
+    // Create the downward vector
+    let mut downward = String::new();
+    if position.0 +1 < matrix.dim().0 as i32 && position.1 -1 > 0 {
+        downward.push(matrix[[position.0 as usize + 1, position.1 as usize - 1]]);
+    }
+    downward.push(matrix[[position.0 as usize, position.1 as usize]]);
+    if position.0 -1 > 0 && position.1 +1 < matrix.dim().1 as i32 {
+        downward.push(matrix[[position.0 as usize - 1, position.1 as usize + 1]]);
+    }
+
+    // Check if upward or downward is equal to MAS or SAM
+    if ((upward == MAS) || (upward == SAM)) && 
+        ((downward == MAS) || (downward == SAM)) {
+            // print position
+
+            println!("Position: ({}, {})", position.0, position.1);
+
+
+            //println!("Upward: {}, Downward: {}", upward, downward);
+            count += 1;
+    }
+
+    count
+}
+
 // Processes part 1 of the problem
 fn process_part_1(input: &str) -> i32 {
     let mut xmas_count = 0;
@@ -77,12 +118,40 @@ fn process_part_1(input: &str) -> i32 {
     xmas_count
 }
 
+// Processes part 2 of the problem
+fn process_part_2(input: &str) -> i32 {
+    let mut xmas_count = 0;
+
+    let lines: Vec<&str> = input.lines().collect();
+
+    // Create a 2D array with ndarray
+    let mut xmas_matrix = Array::from_elem((lines.len(), lines[0].len()), ' ');
+
+    // Loop through the lines and load the characters into the matrix
+    for i in 0..lines.len() {
+        let line = lines[i];
+        for j in 0..line.len() {
+            xmas_matrix[[i, j]] = line.chars().nth(j).unwrap();
+        }
+    }
+
+       // Walk through the matrix and check each value for 'A'
+       for i in 0..lines.len() {
+        for j in 0..lines[0].len() {
+            if xmas_matrix[[i, j]] == 'A' {
+                xmas_count += count_x_mas((i.try_into().unwrap(), j.try_into().unwrap()), &xmas_matrix);
+            }
+        }
+    }
+
+    xmas_count
+}
 
 // Main entry point
 fn main() {
     // The input file is input.txt
-    let infile = "input.txt";
-//    let infile = "/Users/dbelt365/Code/aoc/2024/December-4/input.txt";
+//    let infile = "input.txt";
+    let infile = "/Users/dbelt365/Code/aoc/2024/December-4/input.txt";
     
     // Read the input file into a string
     let input = std::fs::read_to_string(infile).unwrap();
@@ -93,4 +162,9 @@ fn main() {
     // Print the value
     println!("Part 1: {}", value);
 
+    // Process the input data
+    let value = process_part_2(&input);
+
+    // Print the value
+    println!("Part 2: {}", value);
 }
